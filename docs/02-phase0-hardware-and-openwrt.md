@@ -43,6 +43,48 @@ The wiki's teardown (dated 2022, by wiki user `oliver`) gives the real BOM:
   confirmed pinout**, needs a continuity check with a multimeter/logic
   probe against the actual unit.
 
+## No public schematic exists — checked, and there's a structural reason why
+
+Went looking for an actual PCB schematic to nail down RX/TX/GND rather
+than guess from the teardown photo. Came up empty across every realistic
+source:
+
+- No leaked/shared schematic anywhere (GitHub, repair sites, Chinese
+  electronics forums) — checked directly, nothing.
+- **The FCC-filing trick doesn't apply here.** TP-Link's own compliance
+  statement for this switch describes it as a **"Class A digital
+  device"** under FCC Part 15 — that's the *verification* procedure for
+  unintentional radiators (wired equipment with no intentional RF
+  transmitter), not the *certification* procedure that produces a public
+  FCC ID with an exhibit folder (block diagrams, schematics, internal
+  photos). Confirmed by searching fccid.io directly for this model —
+  no genuine match (false positives only, unrelated RC-toy filings that
+  happen to share a substring). A pure switch like this one almost
+  certainly has no FCC ID to look up at all.
+- No `tl-sg2210p` page exists yet on the `svanheule.net` wiki ("this
+  topic does not exist yet"), and the `tl-sg2210mp` page itself still
+  has no pinout section as of this check.
+
+**One genuinely useful thing did turn up**: the wiki's pages for the two
+sibling boards that already have community-documented UART headers —
+`tl-sg2008` and `tl-sg2008p` (different, smaller PCB than ours, but same
+SoC family and same vendor board-design habits) — both describe the
+UART as broken out to an unpopulated header. For the SG2008P
+specifically:
+
+> The UART is broken out to unpopulated header J2. The footprints R27
+> (0201) and R28 (0402) are not populated. To enable serial console, 50
+> ohm resistors should be soldered — any value from 0 ohm to 50 ohm will
+> work. R27 can be replaced by a solder bridge.
+
+**Practical takeaway for when the device is in hand**: don't just look
+for a 4-pad header — check for small unpopulated 0201/0402 resistor
+footprints in series with it too. On this board family, TX/RX can be
+physically wired to a header but *electrically disconnected by design*
+until a resistor (or solder bridge) is added. Finding the right pads
+with continuity testing might not be enough on its own if this pattern
+carries over to the SG2210MP's board.
+
 ## GPL source: what's actually in `rtk-maple_gpl.tar.gz`
 
 Downloaded and inventoried (not fully extracted — ~1GB uncompressed).
