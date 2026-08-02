@@ -1,0 +1,459 @@
+===== page 1 =====
+1 
+模拟& 数模芯片介绍  
+浙江芯昇电子技术有限公司  
+
+===== page 2 =====
+2 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+1 PoE芯片 
+2 马达驱动芯片 
+目录 
+2 其他芯片 
+
+===== page 3 =====
+3 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2101D/XS2100S——PoE PD控制器 
+• 兼容于IEEE 802.3af/at 
+• 2级事件分级，并提供指示信号 
+• 简易的墙上适配器接口 
+• 0至4级PoE分级 
+• 100V绝对最大额定输入 
+• 180mA最大浪涌电流限制 
+• 正常工作期间电流限制在720mA至880mA 
+• 电流限制和折返式保护 
+• 40V UVLO 
+• 过热保护 
+• DFN3*3-10L与SOP8两种封装 
+• 广泛应用于无线AP、IP电话、IP摄像机等 
+产品应用 
+特性 
+RJ-45
+AND
+BRIDGE
+RECTIFIER
+XS2100S
+2-EVENT
+CLASSIFICATION
+DETECTION
+68nF
+SMAJ58A
++
+-
+GND
+VDD T2P
+DET
+CLS
+RCLS
+RDET
+24.9kΩ
+RTN
+WAD
+PG
+DC-DC
+CONVERTER
+ENABLE
+IN-
+IN+
+24V/48V
+BATTERY
+-54V
+RT2P
+C1
+D1
+CBULK
+R1
+R2
+
+===== page 4 =====
+4 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2101D/XS2100S——应用注意事项 
+100mA/div 
+ PG为open-drain输出，用来使能后级DC-DC converter，
+VDD超过PD的uvlo，，下拉200uA，同时满足如下两个
+条件后关闭200uA下拉电流。 
+1、uvlo之后96ms 
+2、完成对Cbulk的充电，即完成inrush 
+ Cbulk不能过大，建议<200uF 
+ 对于无使能的DC-DC，需要注意抽取大电流的时间控制
+在inrush完成之后。但不能太晚，否则PSE会触发mps
+机制下电 
+ WAD用于检测适配器供电，一旦触发会关闭PoE供电。
+在多供电应用中，适配器供电优先于PoE 
+    供电情况下，建议使用WAD功能。 
+ VCLS=1.2V，很多PD的VCLS=2.5V，注意分级电阻的
+阻值选择。 
+ 合理的开销下实现浪涌防护 
+ 
+
+===== page 5 =====
+5 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2180——PoE PSE控制器 
+• 兼容于IEEE 802.3af/at 
+• 0.25Ω电流检测电阻 
+• 单端口输出可高达70W 
+• 9位端口电流和电压监测 
+• 3线串口，兼容I2C 
+• 支持独立供电操作 
+• 遗留设备高电容检测 
+• 支持直流负载断开检测 
+• 支持全自动工作的同时支持软件编程操作 
+• 支持新二事件分级和功率PD设备Class5的
+检测和分级 
+• 输入欠压锁定、输出过压锁定、过温保护 
+• 32-PIN TQFN（5mm×5mm）功率封装 
+• 应用于POE交换机等 
+ 
+产品应用 
+特性 
+XS2180
+AGND
+-54V
+EN VDD
+BN
+AUTO
+MIDSPAN
+EN_CL5
+A0
+A1
+A2
+A3
+OUT1
+GATE1
+OUT2
+GATE2
+OUT3
+GATE3
+OUT4
+GATE4
+SENSE4
+SENSE3
+SENSE2
+SENSE1
+SVEE2
+SVEE1
+VEE
+DGND
+INT
+SCL
+SDAOUT
+SDA IN
+-54V
+端口1
+端口2
+端口3
+端口4
+
+===== page 6 =====
+6 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2180——应用注意事项 
+ 4端口用作单端口输出时候，注意其他
+不用的三个端口的sense接地，否则静
+态功耗成倍增加。 
+ 
+ Sense电阻必须使用开尔文连接，注意
+PCB的电流流向。避免某一通道的电流
+影响其他通道的电流采样，尤其在大功
+率时候影响突出。 
+ 
+ 合理开销下实现浪涌防护 
+
+
+===== page 7 =====
+7 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2184——内建N-MOSFET PoE PSE控制器 
+• 兼容IEEE 802.3at/af  
+• 0.25Ω电流检测电阻 
+• 每个端口高达30W 
+• 9位端口电流和电压实时监测 
+• 兼容I2C，3线串口 
+• 支持独立供电操作 
+• 为遗留设备提供高容值检测 
+• 支持直流负载断开检测 
+• 内建100VDS N通道MOSFET 
+• 48-PIN QFN48L(0707x0.75-0.50)(H)功率
+封装 
+• 应用于POE交换机等 
+ 
+产品应用 
+XS2184
+AGND
+-54V
+EN VDD
+BN
+AUTO
+MIDSPAN
+EN_CL5
+A0
+A1
+A2
+A3
+OUT1
+OUT2
+OUT3
+OUT4
+SENSE4
+SENSE3
+SENSE2
+SENSE1
+SVEE2
+SVEE1
+VEE
+DGND
+INT
+SCL
+SDAOUT
+SDA IN
+-54V
+端口1
+端口2
+端口3
+端口4
+DARIN1
+DARIN2
+DARIN3
+DARIN4
+特性 
+
+===== page 8 =====
+8 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+1 PoE芯片 
+2 马达驱动芯片 
+目录 
+2 其他芯片 
+
+===== page 9 =====
+9 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2200——步进马达驱动 
+ 
+ 
+• 内置 5 通道桥式驱动电路  
+• 通道 1-通道 4：电压控制类型 H桥 
+• 用于镜头 FOCUS 和 ZOOM  
+• 通道 5：电压/电流控制 H桥 
+• ICR-CUT 驱动 H桥  
+• 内置 PLL 
+• 内置 STM 控制电路：自动控制
+（/UP/DOWN  模式），时钟控制 
+• QFN40 5.0mm×5.0mm封装 
+• 应用于摄像机云台驱动、滤光片切换、玩具 
+ 
+ 
+特性 
+产品应用 
+
+===== page 10 =====
+10 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2209——低压直流电机的驱动 
+ 
+ 
+• 支持输入电压范围：电机电源： 1.8~5.5V 
+• 导通电阻（ HS+LS） 1.2 Ω  
+• 低待机功耗 
+• 最大 450mA 电流输出能力 
+• 内置 UVLO 和过温保护 
+• SOP8 封装 
+• 应用于滤光片切换、玩具等 
+ 
+ 
+特性 
+VCC AOUT
+BOUT
+DC 
+Motor
+GND
+AIN
+BIN
+10uF
+0.1uF 
+Cerami c
+XS2209
+产品应用 
+
+
+===== page 11 =====
+11 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2237——低压H桥电机的驱动 
+ 
+ 
+• 支持输入电压范围：电机电源： 1.8~12V, 
+控制电源： 1.8~5.5V 
+• 导通电阻（ HS+LS） 280mΩ LDMOS 
+• 超低功耗睡眠模式 
+• 最大 1.8A 电流输出能力 
+• 内置 UVLO 和过温保护 
+• 内置短路保护和过流保护 
+• 内置 Charge Pump 
+• DFN8(2.0mmx2.0mm)封装 
+• 应用于摄像机滤光片切换、玩具等 
+ 
+ 
+特性 
+产品应用 
+VM OUT1
+OUT2
+DC 
+Motor
+GND
+IN1
+IN2
+10uF
+0.1uF 
+Cerami c
+NSLEE P
+XS2237
+
+
+===== page 12 =====
+12 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2238 ——低压H桥电机的驱动 
+ 
+ 
+• 支持输入电压范围：电机电源： 1.8~5.5V, 
+控制电源： 1.8~5.5V 
+• 导通电阻（ HS+LS） 1.2Ω  
+• 超低功耗睡眠模式 
+• 最大 450mA 电流输出能力 
+• 内置 UVLO 和过温保护 
+• DFN8(2.0mmx2.0mm)封装 
+• 应用于摄像机滤光片切换、玩具等 
+ 
+ 
+特性 
+VM OUT1
+OUT2
+DC 
+Motor
+GND
+IN1
+IN2
+10uF
+0.1uF 
+Cerami c
+NSLEE P
+XS2238
+产品应用 
+
+
+===== page 13 =====
+13 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+1 PoE芯片 
+2 马达驱动芯片 
+目录 
+2 其他芯片 
+
+===== page 14 =====
+14 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS2010——降压调光1.5ALED驱动 
+ 
+ 
+• 宽输入电压范围 2.5~30V 
+• 1MHz 的开关频率 
+• 最高可驱动 1.5A 的白光 LED 
+• 极低导通电阻 100mΩ 
+• 100Hz~1kHz 的宽 PWM 调光频率范围 
+• 0.65~1.2V(0~100%) 模 拟 调 光 电 压 范 
+围(EN/ADIM 管脚兼容) 
+• 小型 SOT23-6L 封装 
+• 应用于摄像机红外灯驱动、白光LED驱动等 
+ 
+ 
+特性 
+XS2010
+IN SEN LX
+GND
+VIN
+CIN
+RSEN LED L
+D
+EN/ADIMDC/PWM
+COUT
+产品应用 
+
+
+===== page 15 =====
+15 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+XS3300——光电式烟感探测器 
+• 输入电源范围1.8V~5V 
+• 两节AA电池供电（3V） 
+• 超低静态电流 
+• 内置防反接 
+• 内置POR 
+• I2C 串口通信 
+• 内置charge pump，支持最高4xVDD升压 
+• 蜂鸣器声压>85dB 
+• 低电池电压检测（阈值可配置） 
+• 两路恒流LED驱动（驱动电流可配置） 
+• 高灵敏度放大器（增益2~64可配置） 
+• 过温保护和驱动过流保护 
+• 小尺寸封装QFN28-4mmx4mm 
+• 智慧型光电式烟雾报警器 
+特性 
+产品应用 
+
+
+===== page 16 =====
+16 
+浙江芯昇电子技术有限公司  |  www.chipup.com 
+支持 
+资料
+ 
+•
+ 规格书
+ 
+•
+ DEMO
+评估板手册
+ 
+•
+ 防护方案
+ 
+•
+ 可靠性报告
+ 
+•
+ Rohs
+报告
+ 
+实物
+ 
+•
+ 芯片样品
+ 
+•
+ DEMO
+评估板
+ 
+•
+ 评估板相关
+SDK
+ 
+技术
+ 
+•
+ 2
+小时反馈
+ 
+•
+ 6
+小时邮件支持
+ 
+•
+ 72
+小时现场支持
+ 
+
+

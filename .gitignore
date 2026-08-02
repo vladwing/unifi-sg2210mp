@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Regeneratable firmware artifacts - see firmware/README.md
+firmware/*.bin
+firmware/*.bin.dec
+firmware/*.squashfs
+firmware/*.jffs2
+firmware/rootfs-*/
+firmware/kernel/
