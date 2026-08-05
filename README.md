@@ -12,10 +12,10 @@ goal, hardware rationale, and phase breakdown.
 |---|---|---|
 | 0 | OpenWrt bring-up (UART, PoE chip ID, bootloader) | Static recon done; needs physical access — paused until hardware's in hand |
 | 1 | UniFi inform-protocol/schema recon | Done — schema, model-capability table, and GPL-source dead ends all resolved |
-| 2 | Real inform-session capture & decrypt | Blocked on hardware |
-| 3 | Schema reconstruction | Substantially done via REST-API-derived schema + controller capability table |
-| 4 | Shim implementation | Early scaffold only (protocol codec + device-state model), deliberately stopped short of network/SSH/Omada wiring |
-| 5 | Validation against real controller | Blocked on hardware |
+| 2 | Real inform-session capture & decrypt | Done — full real adoption handshake captured and decrypted against a live controller (see `docs/05`) |
+| 3 | Schema reconstruction | Done — real `system_cfg`/`mgmt_cfg` config-push format captured directly from a live controller, resolving the VLAN/port/PoE format questions |
+| 4 | Shim implementation | Scaffold + persistent recon shim; achieved a real, fully-adopted device in a live controller's database (`adopted: true`) — see `docs/05` |
+| 5 | Validation against real controller | **Done for the wire protocol/adoption handshake** (real controller, not the SG2210MP) — port-config push and Omada-side wiring still pending |
 
 ## Directory guide
 
@@ -30,6 +30,11 @@ goal, hardware rationale, and phase breakdown.
   - `04-xs2184-poe-driver-analysis.md` — full disassembly of the
     firmware's PoE driver, GOT-resolution method, ChipUP XS2184
     datasheet findings
+  - `05-shim-vs-real-controller-probe.md` — ran the shim's inform codec
+    against a real UniFi Network Application on the management VLAN;
+    found the CBC framing is wire-incompatible with real software (server
+    logs pinpoint why), and found real adopted UniFi devices already
+    living on that VLAN — a cheap path to Phase 2 capture
 - **`disasm/`** — raw disassembly excerpts referenced by `docs/04` (text,
   checked in as-is since re-deriving them takes a full analysis pass)
 - **`reference/`** — external reference material pulled during recon:

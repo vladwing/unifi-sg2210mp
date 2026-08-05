@@ -60,9 +60,20 @@ apply to switches too) is documented in:
 Covers:
 - **L2 discovery**: UDP broadcast on port 10001, TLV-encoded announcement
   packet, sent by unadopted devices.
-- **Adoption handshake**: controller SSHes into the device (default
+- **Adoption handshake**: ~~controller SSHes into the device (default
   `ubnt:ubnt`) and runs
-  `/usr/bin/syswrapper.sh set-adopt http://<controller>:8080/inform <16-byte hex key>`.
+  `/usr/bin/syswrapper.sh set-adopt http://<controller>:8080/inform <16-byte hex key>`~~
+  — **corrected by real-controller testing, see `05-shim-vs-real-controller-probe.md`**:
+  for a device already informing successfully on the controller's own L2
+  segment, adoption happens entirely over the inform HTTP channel (the
+  controller replies to an inform with a `setparam` command carrying a new
+  per-device key). No SSH connection occurs during adoption. SSH is used
+  *afterward*, and in the opposite direction — the controller pushes its
+  own public key into the device's local `sshd.auth.key.1.*` config for
+  future management access. The SSH-push-based flow described above may
+  still be real for cross-subnet (L3) adoption where inform_url isn't
+  already configured, but that's now the untested case, not the default
+  one.
 - **Inform loop**: device POSTs encrypted status to `http://<controller>:8080/inform`
   every ~10s; controller replies no-op or command. AES-128-CBC (unpadded),
   or AES-GCM on newer firmware. Freshly-adopted devices use a known

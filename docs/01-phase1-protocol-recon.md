@@ -148,7 +148,17 @@ header's flags field is a bitmask:
 - `0x08` = AES-GCM (in addition to `0x01`; CBC is the default when only
   `0x01` is set)
 
-**Not fully resolved**: no source pinned down exactly which US-8-150W
+**Resolved for real hardware on this network** — see
+`05-shim-vs-real-controller-probe.md`: a live packet capture of three
+genuine, currently-adopted Ubiquiti devices' inform traffic shows
+`flags=0x000d` (`ENCRYPTED|SNAPPY|GCM`) on every single packet, so at
+least this firmware generation uses **AES-GCM + Snappy**, not CBC/zlib.
+Also found `pkt_version=0` (not `1`) and that the 16-byte IV field holds a
+full-width GCM nonce, not a 12-byte nonce zero-padded to 16. Payload
+still unread (needs the per-device key, not captured). Original
+CBC-focused note preserved below for history:
+
+No source pinned down exactly which US-8-150W
 firmware version switched from CBC to GCM. One concrete data point: a
 US-8-150W unit was reported shipping with firmware **5.11.0.11599**
 (community forum thread), and `unifi-poller`'s switch-stat struct has

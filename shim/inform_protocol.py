@@ -3,15 +3,21 @@
 Reconstructed from public documentation (fxkr/unifi-protocol-reverse-engineering,
 jeffreykog/unifi-inform-protocol, jrjparks.github.io/unofficial-unifi-guide) and
 cross-checked against a real (if unfinished/never-adopted) implementation,
-stephanlascar/unifi-gateway. Not yet validated against a real controller or
-real device traffic — that's Phase 2 (packet capture) work.
+stephanlascar/unifi-gateway. Header layout and defaults below are now validated
+against a live packet capture of three real, currently-adopted Ubiquiti devices
+(see `../docs/05-shim-vs-real-controller-probe.md`) — all ten captured packets
+agreed exactly on `pkt_version=0`, `flags=0x000d` (ENCRYPTED|SNAPPY|GCM), and a
+full-width 16-byte GCM nonce with no zero-padding. The payload itself is still
+unread (needs a per-device key, not captured), so JSON field shapes remain
+unvalidated against real traffic.
 
 Header layout (40 bytes, big-endian), followed by the payload:
     0:4   magic       b"TNBU"
-    4:8   pkt_version uint32
+    4:8   pkt_version uint32 (0 on real hardware)
     8:14  mac         6 bytes
     14:16 flags       uint16 (bit0=encrypted, bit1=zlib, bit2=snappy, bit3=gcm)
-    16:32 iv          16 bytes (AES-CBC IV, or GCM nonce left-padded to 16)
+    16:32 iv          16 bytes (AES-CBC IV, or full-width GCM nonce -- real
+                       hardware does NOT truncate-and-pad a 12-byte nonce here)
     32:36 payload_version uint32
     36:40 payload_len uint32
 """
@@ -56,38 +62,68 @@ def encode_inform(
     payload: dict,
     mac: bytes,
     key: bytes = DEFAULT_ADOPTION_KEY,
-    pkt_version: int = 1,
+    pkt_version: int = 0,
     payload_version: int = 1,
-    use_gcm: bool = False,
+    use_gcm: bool = True,
 ) -> bytes:
-    """Build a full inform packet (header + encrypted/compressed payload)."""
+    """Build a full inform packet (header + encrypted/compressed payload).
+
+    Defaults match real captured hardware: GCM + Snappy, pkt_version 0.
+    Pass use_gcm=False to build the (still wire-format-valid, but never
+    observed in the wild) CBC + zlib variant instead.
+    """
     if len(mac) != 6:
         raise InformError("mac must be 6 bytes")
 
-    body = zlib.compress(json.dumps(payload).encode())
-    flags = FLAG_ENCRYPTED | FLAG_ZLIB
+    json_bytes = json.dumps(payload).encode()
 
     if use_gcm:
-        flags |= FLAG_GCM
-        nonce = get_random_bytes(12)
+        import snappy
+
+        body = snappy.compress(json_bytes)
+        flags = FLAG_ENCRYPTED | FLAG_SNAPPY | FLAG_GCM
+        # Real hardware uses a full-width 16-byte GCM nonce, not the
+        # standard 12-byte nonce padded to 16.
+        nonce = get_random_bytes(16)
+        # GCM is a stream cipher (no padding), so ciphertext length equals
+        # plaintext length; the 16-byte tag is appended after. That means
+        # the final payload_len is known before encrypting, which matters
+        # because the header (below) doubles as the AAD and must exist
+        # before the cipher runs.
+        payload_len = len(body) + 16
+        header = (
+            MAGIC
+            + struct.pack(">I", pkt_version)
+            + mac
+            + struct.pack(">H", flags)
+            + nonce
+            + struct.pack(">I", payload_version)
+            + struct.pack(">I", payload_len)
+        )
         cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+        # Confirmed via decompiling the real controller's InformServlet:
+        # GCM inform binds the 40-byte plaintext header itself as AAD
+        # (com.ubnt.net.InformServlet$jRsSex.TgovGTpPRqBiOa() builds this
+        # exact header-only byte string before the decrypt call). Skipping
+        # this makes the tag fail to verify even with the correct key.
+        cipher.update(header)
         ciphertext, tag = cipher.encrypt_and_digest(body)
-        iv_field = nonce.ljust(16, b"\x00")
         encrypted = ciphertext + tag
     else:
+        body = zlib.compress(json_bytes)
+        flags = FLAG_ENCRYPTED | FLAG_ZLIB
         iv_field = get_random_bytes(16)
         cipher = AES.new(key, AES.MODE_CBC, iv_field)
         encrypted = cipher.encrypt(_pkcs7_pad(body))
-
-    header = (
-        MAGIC
-        + struct.pack(">I", pkt_version)
-        + mac
-        + struct.pack(">H", flags)
-        + iv_field
-        + struct.pack(">I", payload_version)
-        + struct.pack(">I", len(encrypted))
-    )
+        header = (
+            MAGIC
+            + struct.pack(">I", pkt_version)
+            + mac
+            + struct.pack(">H", flags)
+            + iv_field
+            + struct.pack(">I", payload_version)
+            + struct.pack(">I", len(encrypted))
+        )
     return header + encrypted
 
 
@@ -104,8 +140,9 @@ def decode_inform(data: bytes, key: bytes = DEFAULT_ADOPTION_KEY) -> dict:
 
     if flags & FLAG_ENCRYPTED:
         if flags & FLAG_GCM:
-            nonce, tag = iv[:12], body[-16:]
+            nonce, tag = iv, body[-16:]
             cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+            cipher.update(data[0:40])  # AAD = the 40-byte plaintext header
             body = cipher.decrypt_and_verify(body[:-16], tag)
         else:
             cipher = AES.new(key, AES.MODE_CBC, iv)
